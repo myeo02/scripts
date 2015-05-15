@@ -1,0 +1,40 @@
+sed -i -e '1i"#######"\' /usr/apps/pisc_as/pisc/CAR/input/finance/DIFF_AGENCY_PL_FINANCE_ORG_AGE.CSV
+sed -i -e '1i#######\' /usr/apps/pisc_as/pisc/CAR/input/finance/DIFF_AGENCY_PL_FINANCE_ORG_AGE.CSV
+FIRST_LINE="$(head -n 1 $INPUT_DIR/$SRC_FILE)" echo $FIRST_LINE sed -i  -e '1i$FIRST_LINE\' '/usr/apps/pisc_as/pisc/CAR/input/finance/DIFF_AGENCY_PL_FINANCE_ORG_AGE.CSV'
+####  Copy lines from one file to another
+sed -n "1, 10000p"  /home/n0213100/test/CAR/AGENCY_PL_BONUS_HIERARCHY_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_BONUS_HIERARCHY_AGE.CSV 
+sed -n "1, 1000p"  /home/n0213100/test/CAR/AGENCY_PL_FINANCE_ORG_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_FINANCE_ORG_AGE.CSV 
+sed -n "1, 8000p"  /home/n0213100/test/CAR/AGENCY_PL_FINANCE_ORG_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_FINANCE_ORG_AGE.CSV 
+sed -n "1, 10000p"  /home/n0213100/test/CAR/AGENCY_PL_FINANCE_ORG_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_FINANCE_ORG_AGE.CSV 
+sed -n "1, 10p"  /home/n0213100/test/CAR/AGENCY_PL_LICENSE_STATE_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV 
+###
+###   copy and display the first column of each line
+cat /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV | cut -d ',' -f1 
+cat /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV | cut -f2 -s
+awk -F "\"*,\"*" '{print $2}' /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV 
+cut -d ',' -f1 /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV
+
+awk  'BEGIN { OFS="|"} { print $1,$2,$3 }'  /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV
+awk  -F '|' '{ print $1"|"$2"|"$3"|" $4 }'  /usr/apps/pisc_as/pisc/CAR/staging/AGENCY_PL_LICENSE_STATE_AGE.CSV > /usr/apps/pisc_as/pisc/CAR/staging/EXTRACTED_AGENCY_PL_LICENSE_STATE_AGE.CSV
+
+## Count the number of word
+tr ' ' '\n' < /usr/apps/pisc_as/pisc/AGE/input/DIFF_XMLFILE.txt | grep /AgencySynchronization | wc -l
+
+
+### xslt transform file
+xsltproc -o  /usr/apps/pisc_as/pisc/AGE/input/DIFF.txt /usr/apps/pisc_as/pisc/AGE/scripts/getChangeActivityInd.xsl /usr/apps/pisc_as/pisc/AGE/input/XMLFILE.txt.baseline
+
+###
+xml_grep 'RecordCount' /usr/apps/pisc_as/pisc/AGE/input/XMLFILE.txt 
+
+
+####
+inputs
+if [ ! -f inputs_CAR_Finance_local.properties ] then echo "File is not present." else source inputs_CAR_Finance_local.properties fi
+
+####
+echo "cat //AgencySynchronizationFile/AgencySynchronization/Producer/GeneralPartyInfo/ProducerInfo/ChangeActivityInd" | xmllint --shell /usr/apps/pisc_as/pisc/AGE/input/XMLFILE.txt | sed '/^\/ >/d' | sed 's/<[^>]*.//g'
+
+
+### Find all regular files in and below the current directory whose names don't end with the .gz extension.
+find . -type f ! -name '*.gz' -exec gzip "{}" \;
